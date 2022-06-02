@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        let data =
+          "10,赤かぶ約３ｋｇ,1,99,999,999,100,100,100,100,99,99,2000/01/01,kg,1234567890123      ";
+
+
+        data = "123456,あいうえお,123456,かきくけこ,さしすせそ,123456,09012341234,09012341234,2021/11/18,火,09012341234,たちつてと,09012341234,住所１,12345,住所２,12345,2021/11/18,2021/11/18,00:00,24:00,1,12345,12345,なにぬねの,はひふへほ,12345,入力１,入力２,入力３"
+
+        data = data.trim();
+        const listObject = data.split(",");
+        const newObject = listObject.map((x, index) => {
+          return { index: index + 1, value: x };
+        });
+        console.log(newObject);
+      })();
+    </script>
+  </body>
+</html>

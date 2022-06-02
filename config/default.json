@@ -1,0 +1,4 @@
+{
+  "mongoURL": "mongodb+srv://hducnam28:mrbean1998@test.ohtqd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+  "jwtToken": "jsonWebToken"
+}

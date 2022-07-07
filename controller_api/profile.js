@@ -102,7 +102,7 @@ router.get("/:id", async (req, res) => {
 });
 module.exports = router;
 
-//delete profile user id
+//delete profile user and profile with id
 router.delete("/", auth, async (req, res) => {
   try {
     await profile.findOneAndDelete({ user: req.user.id });
@@ -113,7 +113,7 @@ router.delete("/", auth, async (req, res) => {
   }
 });
 
-//add profile detail
+//add profile detail exp
 router.put(
   "/experience",
   auth,

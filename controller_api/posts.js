@@ -75,7 +75,7 @@ router.delete("/delete/:post_id", auth, async (req, res) => {
   }
 });
 
-//post like and unlike
+//like post
 router.put("/updateLike/:id", auth, async (req, res) => {
   try {
     const postFind = await Post.findById(req.params.id);
@@ -83,11 +83,16 @@ router.put("/updateLike/:id", auth, async (req, res) => {
       postFind.likes.filter((like) => like.user.toString() === req.user.id)
         .length > 0
     )
-      res.json({ msg: "user has been liked " });
+      res.json({ msg: "user has been liked ", data: postFind.likes });
     else {
       postFind.likes.unshift({ user: req.user.id });
       await postFind.save();
-      res.json({ msg: "save data !" });
+      res.json({
+        msg: "save data !",
+        body: postFind.likes,
+        // user: req.user.id,
+        postId: req.params.id,
+      });
     }
   } catch (error) {
     res.json({ error: error.message });
@@ -103,31 +108,65 @@ router.delete("/updateLike/:id", auth, async (req, res) => {
       .indexOf(req.user.id);
     postFind.likes.splice(removeIndex, 1);
     await postFind.save();
-    res.json({ msg: "sucess !", object: postFind, user: req.user.id });
+    res.json({
+      msg: "sucess !",
+      body: postFind.likes,
+      // user: req.user.id,
+      postId: req.params.id,
+    });
   } catch (error) {
     res.json({ error: error.message });
   }
 });
 
-//add & remove comments
+//add comment with post id
+router.post("/addComment/:id", auth, async (req, res) => {
+  try {
+    const postFind = await Post.findById(req.params.id);
+    const comment = {
+      user: req.user.id.toString(),
+      text: req.body.comment,
+    };
+    postFind.comments.push(comment);
+    await postFind.save();
+    res.json({
+      msg: "sucess",
+      body: postFind.comments,
+      userFind: req.user.id,
+    });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
+//update comment with post id
 router.post("/updateComment/:id", auth, async (req, res) => {
   try {
     if (req.body && req.body["comment"]) {
       const postFind = await Post.findById(req.params.id);
       const comment = {
-        user: req.user.id,
+        user: req.user.id.toString(),
         text: req.body.comment,
       };
       if (postFind.comments.length === 0) {
         postFind.comments.push(comment);
       } else {
-        const listComment = postFind.comments
-          .filter((x) => x.user)
-          .indexOf(req.user.id);
-        postFind.comments[listComment] = comment;
+        console.log(req.user.id, comment);
+        const listComment = postFind.comments.findIndex(
+          (x) => x._id.toString() === req.body.commentId
+        );
+        postFind.comments[listComment]["text"] = comment.text;
       }
+
+      //code test
+      // postFind["comments"] = [];
+
       await postFind.save();
-      res.json({ msg: "sucess" });
+      res.json({
+        msg: "sucess",
+        body: postFind.comments,
+        userFind: req.user.id,
+      });
     } else {
       res.json({ error: "no comment " });
     }
@@ -145,7 +184,7 @@ router.delete("/deleteComment/:id", auth, async (req, res) => {
       if (find) {
         listComment.comments.splice(find, 1);
         await listComment.save();
-        res.json({ msg: "sucess delete comment " });
+        res.json({ msg: "sucess delete comment ", body: listComment.comments });
       } else {
         res.json({ error: "comment as not found" });
       }
@@ -157,3 +196,19 @@ router.delete("/deleteComment/:id", auth, async (req, res) => {
   }
 });
 module.exports = router;
+
+//update post title
+router.post("/updatePostTitle/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (post) {
+      post.text = req.body.text;
+      await post.save();
+      res.json({ msg: "sucess ! ", body: post });
+    } else {
+      res.json({ msg: "error , no find post ! " });
+    }
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});

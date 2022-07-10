@@ -176,13 +176,18 @@ router.post("/updateComment/:id", auth, async (req, res) => {
 });
 
 //remove comments
-router.delete("/deleteComment/:id", auth, async (req, res) => {
+router.post("/deleteComment/:id", auth, async (req, res) => {
   try {
     const listComment = await Post.findById(req.params.id);
+    const idCommentDelete = req.body.idCommentDelete;
     if (listComment.comments.length > 0) {
-      const find = listComment.comments.map((x) => x.user).indexOf(req.user.id);
-      if (find) {
+      const find = listComment.comments.findIndex(
+        (x) => x._id.toString() === idCommentDelete.toString()
+      );
+      console.log("vi tri can xoa :", find, idCommentDelete);
+      if (find !== -1) {
         listComment.comments.splice(find, 1);
+        console.log(listComment.comments.length, listComment.comments);
         await listComment.save();
         res.json({ msg: "sucess delete comment ", body: listComment.comments });
       } else {
